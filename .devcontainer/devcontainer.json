@@ -1,0 +1,21 @@
+{
+    "name": "c-devcontainer",
+    "build": {  
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "telemetry.enableTelemetry": false,
+                "extensions.ignoreRecommendations": false
+            },
+            "extensions": [
+                "ms-vscode.cpptools",
+                "kunalg.library-documentation-cpp",
+                "danielpinto8zz6.c-cpp-compile-run",
+                "ms-vscode.cpptools-extension-pack",
+                "streetsidesoftware.code-spell-checker"
+            ]
+        }
+    }
+}
