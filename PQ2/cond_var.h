@@ -1,14 +1,11 @@
 #include "tl_semaphore.h"
 #include <stdatomic.h>
-#include <pthread.h>
 
 #define MAX_THREADS 100
 
 typedef struct condition_variable {
-        pthread_t* waiting_threads;
         atomic_int current_end;
         atomic_int current_thread;
-        atomic_int current_gen;
 } condition_variable;
 
 
