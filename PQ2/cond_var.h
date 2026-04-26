@@ -6,6 +6,7 @@
 typedef struct condition_variable {
         atomic_int current_end;
         atomic_int current_thread;
+        ticket_lock* lock;
 } condition_variable;
 
 
