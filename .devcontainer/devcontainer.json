@@ -3,6 +3,9 @@
     "build": {  
         "dockerfile": "Dockerfile"
     },
+    "mounts": [
+        "source=${env:HOME}/.ssh,target=/root/.ssh,type=bind"
+    ],
     "customizations": {
         "vscode": {
             "settings": {
