@@ -15,9 +15,6 @@ threads continue to run and every thread that acquires the lock eventually relea
 
 void rwlock_init(rwlock* lock)
 {
-/*
-* Initializes the read-write lock.
-*/
     lock->active_readers = 0;
     lock->active_writer = 0;
     lock->waiting_writers= 0;
@@ -26,10 +23,6 @@ void rwlock_init(rwlock* lock)
 }
 
 void rwlock_acquire_read(rwlock* lock){
-/*
-* Acquires the lock for reading.
-* can only get the lock if there are no writers because of writer preference 
-*/
     //must acquire the lock in order to check the active_writer and waiting_writers
     ticketlock_acquire(&lock->inner_lock);
 
@@ -47,9 +40,6 @@ void rwlock_acquire_read(rwlock* lock){
 }
 
 void rwlock_release_read(rwlock* lock){
-/*
-* Releases the lock after reading.
-*/
     ticketlock_acquire(&lock->inner_lock);
     lock->active_readers--;
 
@@ -61,9 +51,6 @@ void rwlock_release_read(rwlock* lock){
 }
 
 void rwlock_acquire_write(rwlock* lock){
-/*
-* Acquires the lock for writing (exclusive access).
-*/
     ticketlock_acquire(&lock->inner_lock);
     lock->waiting_writers++;
     while(lock->active_writer == 1 || lock->active_readers > 0){

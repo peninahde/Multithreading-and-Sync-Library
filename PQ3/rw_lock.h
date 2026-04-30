@@ -19,4 +19,25 @@ typedef struct
 
 } rwlock; 
 
+/*
+* Initializes the read-write lock.
+*/
+void rwlock_init(rwlock* lock);
+
+/*
+* Acquires the lock for reading.
+* can only get the lock if there are no writers because of writer preference 
+*/
+void rwlock_acquire_read(rwlock* lock);
+
+/*
+* Releases the lock after reading.
+*/
+void rwlock_release_read(rwlock* lock);
+
+/*
+* Acquires the lock for writing (exclusive access).
+*/
+void rwlock_acquire_write(rwlock* lock);
+
 #endif
