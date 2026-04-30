@@ -10,6 +10,7 @@ threads continue to run and every thread that acquires the lock eventually relea
 #include <sched.h>
 #include <stdbool.h>
 #include "tl_semaphore.h"
+#include "cond_var.h"
 #include "rw_lock.h"
 
 void rwlock_init(rwlock* lock)
@@ -32,7 +33,7 @@ void rwlock_acquire_read(rwlock* lock){
     //must acquire the lock in order to check the active_writer and waiting_writers
     ticketlock_acquire(&lock->inner_lock);
 
-    //if there are any active or waiting writers, release the lock and go to sleep until woken (then reaquires the lock)
+    //if there are any active or waiting writers, release the lock and go to sleep until woken (then re-acquires the lock)
     while(lock->active_writer == 1 || lock->waiting_writers > 0){
         condition_variable_wait(&lock->cv, &lock->inner_lock);
     }
@@ -59,13 +60,32 @@ void rwlock_release_read(rwlock* lock){
     ticketlock_release(&lock->inner_lock);
 }
 
-void rwlock_acquire_write(rwlock* lock);
+void rwlock_acquire_write(rwlock* lock){
 /*
 * Acquires the lock for writing (exclusive access).
 */
+    ticketlock_acquire(&lock->inner_lock);
+    lock->waiting_writers++;
+    while(lock->active_writer == 1 || lock->active_readers > 0){
+        condition_variable_wait(&lock->cv, &lock->inner_lock);
+    }
+    lock->waiting_writers--;
+    lock->active_writer = 1;
+    ticketlock_release(&lock->inner_lock);
+}
 
 
-void rwlock_release_write(rwlock* lock);
+
+void rwlock_release_write(rwlock* lock){
 /*
 * Releases the lock after writing.
 */
+    ticketlock_acquire(&lock->inner_lock);
+    lock->active_writer = 0;
+
+    //wake up the waiting writers
+    condition_variable_broadcast(&lock->cv);
+
+    ticketlock_release(&lock->inner_lock);
+
+}

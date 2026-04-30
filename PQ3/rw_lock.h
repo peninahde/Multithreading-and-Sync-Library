@@ -4,7 +4,7 @@
 #include <stdatomic.h>
 #include <sched.h>
 #include "tl_semaphore.h"
-// #include "cond_var.h" ADD THIS WHEN AVI MERGES
+#include "cond_var.h" 
 
 typedef struct 
 {
@@ -15,8 +15,8 @@ typedef struct
     ticket_lock inner_lock;
 
     //will have to edit this part according to what Avi named it
-    cond_var cv; 
+    condition_variable cv; 
 
-} rwlock;
+} rwlock; 
 
 #endif
