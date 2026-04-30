@@ -33,7 +33,7 @@ void rwlock_acquire_read(rwlock* lock){
     ticketlock_acquire(&lock->inner_lock);
 
     //if there are any active or waiting writers, release the lock and go to sleep until woken (then reaquires the lock)
-    while(lock->active_writer = 1 || lock->waiting_writers > 0){
+    while(lock->active_writer == 1 || lock->waiting_writers > 0){
         condition_variable_wait(&lock->cv, &lock->inner_lock);
     }
 
@@ -45,11 +45,19 @@ void rwlock_acquire_read(rwlock* lock){
 
 }
 
-void rwlock_release_read(rwlock* lock);
+void rwlock_release_read(rwlock* lock){
 /*
 * Releases the lock after reading.
 */
+    ticketlock_acquire(&lock->inner_lock);
+    lock->active_readers--;
 
+    if(lock->active_readers == 0){
+        condition_variable_broadcast(&lock->cv);
+    }
+
+    ticketlock_release(&lock->inner_lock);
+}
 
 void rwlock_acquire_write(rwlock* lock);
 /*
