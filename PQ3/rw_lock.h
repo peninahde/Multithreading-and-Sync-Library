@@ -40,4 +40,9 @@ void rwlock_release_read(rwlock* lock);
 */
 void rwlock_acquire_write(rwlock* lock);
 
+/*
+* Releases the lock after writing.
+*/
+void rwlock_release_write(rwlock* lock);
+
 #endif

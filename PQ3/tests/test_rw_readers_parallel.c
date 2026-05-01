@@ -72,6 +72,7 @@ int main(){
         printf("----SUCCESS: Parallelism detected babyyyy! ----\n");
     } else {
         printf("----FAILED: Parallelism not detected :( ----\n");
+        return 1;
     }
     return 0;
 }

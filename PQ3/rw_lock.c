@@ -61,12 +61,7 @@ void rwlock_acquire_write(rwlock* lock){
     ticketlock_release(&lock->inner_lock);
 }
 
-
-
 void rwlock_release_write(rwlock* lock){
-/*
-* Releases the lock after writing.
-*/
     ticketlock_acquire(&lock->inner_lock);
     lock->active_writer = 0;
 
