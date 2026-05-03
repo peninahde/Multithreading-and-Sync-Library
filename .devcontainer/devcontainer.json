@@ -3,6 +3,7 @@
     "build": {  
         "dockerfile": "Dockerfile"
     },
+    "remoteUser": "vscode",
     "mounts": [
         "source=${env:HOME}/.ssh,target=/root/.ssh,type=bind"
     ],
