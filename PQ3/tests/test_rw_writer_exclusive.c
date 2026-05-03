@@ -14,7 +14,6 @@ return 1 on failure
 #include <stdatomic.h>
 #include <sched.h>
 #include <pthread.h>
-#include <assert.h>
 #include "../rw_lock.h"
 
 #define N 8
