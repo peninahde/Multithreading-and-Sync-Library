@@ -10,10 +10,8 @@ void* incCounter(void* arg) {
     condition_variable* cv = args->cv;
     ticket_lock* ext = args->ext;
     ticketlock_acquire(ext);
-    printf("Waiting\n");
     atomic_fetch_add(&waiting, 1);
     condition_variable_wait(cv, ext);
-    printf("done waiting\n");
     counter++;
     ticketlock_release(ext);
     return 0;
