@@ -1,5 +1,6 @@
 #!/bin/bash
 
+cd "$(dirname "$0")"
 # check that the output directory exists
 mkdir -p output
 EXIT_STATUS=0
