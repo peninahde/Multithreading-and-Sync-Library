@@ -1,9 +1,6 @@
 // this will be my blueprint file which will define the struct and function names
 // other files will use this file to know what the semaphore looks like without 
 // having to have the actual code in their file
-#ifndef TL_SEMAPHORE_H
-#define TL_SEMAPHORE_H
-
 #include <stdatomic.h>
 #include <sched.h>
 
@@ -26,5 +23,3 @@ void ticketlock_release(ticket_lock* lock);
 void semaphore_init(semaphore* sem, int initial_value);
 void semaphore_wait(semaphore* sem);
 void semaphore_signal(semaphore* sem);
-
-#endif

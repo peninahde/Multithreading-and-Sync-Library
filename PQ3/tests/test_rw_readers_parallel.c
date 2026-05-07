@@ -14,7 +14,7 @@ return 1 on failure
 #include <sched.h>
 #include <pthread.h>
 #include <assert.h>
-#include "../rw_lock.h"
+#include "rw_lock.h"
 
 #define N 8
 
@@ -33,8 +33,6 @@ void* reader_thread_func(void* args){
     while(current > seen && !atomic_compare_exchange_weak(&test_max_seen_readers, &seen, current));
 
     for (volatile int i = 0; i < 1000000; i++);
-    
-    atomic_fetch_sub(&test_active_readers, 1);
 
     rwlock_release_read(lock);
     return NULL;

@@ -1,5 +1,3 @@
-#ifndef COND_VAR_H
-#define COND_VAR_H
 #include "tl_semaphore.h"
 #include <stdatomic.h>
 
@@ -47,5 +45,3 @@ void condition_variable_signal(condition_variable* cv);
 * If no threads are waiting, this function does nothing.
 */
 void condition_variable_broadcast(condition_variable* cv);
-
-#endif

@@ -9,17 +9,17 @@ threads continue to run and every thread that acquires the lock eventually relea
 #include <stdatomic.h>
 #include <sched.h>
 #include <stdbool.h>
-#include "tl_semaphore.h"
-#include "cond_var.h"
 #include "rw_lock.h"
+#include <stdio.h>
 
 void rwlock_init(rwlock* lock)
 {
-    lock->active_readers = 0;
-    lock->active_writer = 0;
-    lock->waiting_writers= 0;
-
+    atomic_store(&lock->active_readers, 0);
+    atomic_store(&lock->active_writer, 0);
+    atomic_store(&lock->waiting_writers, 0);
+    condition_variable_init(&lock->cv);
     ticketlock_init(&lock->inner_lock); //ticket lock to protect our variables
+
 }
 
 void rwlock_acquire_read(rwlock* lock){
@@ -27,12 +27,12 @@ void rwlock_acquire_read(rwlock* lock){
     ticketlock_acquire(&lock->inner_lock);
 
     //if there are any active or waiting writers, release the lock and go to sleep until woken (then re-acquires the lock)
-    while(lock->active_writer == 1 || lock->waiting_writers > 0){
+    while(atomic_load(&lock->active_writer) == 1 || atomic_load(&lock->waiting_writers) > 0) {
         condition_variable_wait(&lock->cv, &lock->inner_lock);
     }
 
     //now that we have the lock, we need to update the active_readers
-    lock->active_readers++;
+    atomic_fetch_add(&lock->active_readers, 1);
 
     //release the lock!
     ticketlock_release(&lock->inner_lock);
@@ -41,9 +41,9 @@ void rwlock_acquire_read(rwlock* lock){
 
 void rwlock_release_read(rwlock* lock){
     ticketlock_acquire(&lock->inner_lock);
-    lock->active_readers--;
+    atomic_fetch_sub(&lock->active_readers, 1);
 
-    if(lock->active_readers == 0){
+    if(atomic_load(&lock->active_readers) == 0) {
         condition_variable_broadcast(&lock->cv);
     }
 
@@ -52,18 +52,18 @@ void rwlock_release_read(rwlock* lock){
 
 void rwlock_acquire_write(rwlock* lock){
     ticketlock_acquire(&lock->inner_lock);
-    lock->waiting_writers++;
-    while(lock->active_writer == 1 || lock->active_readers > 0){
+    atomic_fetch_add(&lock->waiting_writers, 1);
+    while(atomic_load(&lock->active_writer) == 1 || atomic_load(&lock->active_readers) > 0) {
         condition_variable_wait(&lock->cv, &lock->inner_lock);
     }
-    lock->waiting_writers--;
-    lock->active_writer = 1;
+    atomic_fetch_sub(&lock->waiting_writers, 1);
+    atomic_store(&lock->active_writer, 1);
     ticketlock_release(&lock->inner_lock);
 }
 
 void rwlock_release_write(rwlock* lock){
     ticketlock_acquire(&lock->inner_lock);
-    lock->active_writer = 0;
+    atomic_store(&lock->active_writer, 0);
 
     //wake up the waiting writers
     condition_variable_broadcast(&lock->cv);

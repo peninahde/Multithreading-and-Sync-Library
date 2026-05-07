@@ -1,16 +1,11 @@
-#ifndef RW_LOCK_H
-#define RW_LOCK_H
-
-#include <stdatomic.h>
 #include <sched.h>
-#include "tl_semaphore.h"
 #include "cond_var.h" 
 
 typedef struct 
 {
-    int active_readers;
-    int active_writer; // 0 or 1
-    int waiting_writers;
+    atomic_int active_readers;
+    atomic_int active_writer; // 0 or 1
+    atomic_int waiting_writers;
 
     ticket_lock inner_lock;
 
@@ -44,5 +39,3 @@ void rwlock_acquire_write(rwlock* lock);
 * Releases the lock after writing.
 */
 void rwlock_release_write(rwlock* lock);
-
-#endif
